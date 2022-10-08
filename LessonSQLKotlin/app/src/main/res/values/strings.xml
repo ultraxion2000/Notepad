@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">LessonSQLKotlin</string>
+    <string name="app_name">Notepad</string>
+    <string name="ed_title_hint">Заголовок</string>
+    <string name="ed_desc_hint">Описание</string>
 </resources>
