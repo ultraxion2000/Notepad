@@ -2,10 +2,12 @@ package com.example.lessonsqlkotlin
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.lessonsqlkotlin.db.MyDbManager
+import com.example.lessonsqlkotlin.db.MyIntentConstants
 import kotlinx.android.synthetic.main.edit_activity.*
 
 class EditActivity : AppCompatActivity() {
@@ -17,6 +19,7 @@ class EditActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edit_activity)
+        getMyIntents()
     }
 
     override fun onDestroy() {
@@ -32,8 +35,10 @@ class EditActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK && requestCode == imageRequestCode){
+
             imMyImage.setImageURI(data?.data)
             tempImageUri = data?.data.toString()
+            contentResolver.takePersistableUriPermission(data?.data!!,  Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
     }
 
@@ -50,7 +55,7 @@ class EditActivity : AppCompatActivity() {
     }
 
     fun onClickChooseImage(view: View) {
-        val intent = Intent(Intent.ACTION_PICK)
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.type = "image/*"
         startActivityForResult(intent, imageRequestCode)
     }
@@ -61,7 +66,29 @@ class EditActivity : AppCompatActivity() {
 
         if(myTitle != "" && myDesc != ""){
             myDbManager.insertToDb(myTitle, myDesc, tempImageUri)
+            finish()
         }
     }
+    private fun getMyIntents(){
+        val i = intent
+        if(i != null){
+            if(i.getStringExtra(MyIntentConstants.I_TITLE_KEY) != null){
 
+                fbAddImage.visibility = View.GONE
+
+                edTitle.setText(i.getStringExtra(MyIntentConstants.I_TITLE_KEY))
+                edDesc.setText(i.getStringExtra(MyIntentConstants.I_DESC_KEY))
+
+            if(i.getStringExtra(MyIntentConstants.I_URI_KEY) != "empty"){
+
+                mainImageLayout.visibility = View.VISIBLE
+
+                imMyImage.setImageURI(Uri.parse(i.getStringExtra(MyIntentConstants.I_URI_KEY)))
+
+                imButtonDelete.visibility = View.GONE
+                imButtonEditImage.visibility = View.GONE
+            }
+            }
+        }
+    }
 }

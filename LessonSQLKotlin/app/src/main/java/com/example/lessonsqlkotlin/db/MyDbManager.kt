@@ -5,7 +5,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 
-class MyDbManager( context: Context) {
+class MyDbManager(context: Context) {
     val myDbHelper = MyDbHelper(context)
     var db: SQLiteDatabase? = null
 
@@ -24,24 +24,32 @@ class MyDbManager( context: Context) {
 
 
     @SuppressLint("Range")
-    fun readDbData(): ArrayList<String> {
-        val dataList = ArrayList<String>()
+    fun readDbData(): ArrayList<ListItem> {
+        val dataList = ArrayList<ListItem>()
         val cursor = db?.query(
             MyDbNameClass.TABLE_NAME, null, null,
             null, null, null, null
         )
 
-        while(cursor?.moveToNext() !! ) {
-            val dataText = cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_TITLE))
-            val dataText2 = cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_CONTENT))
-            dataList.add(dataText.toString())
-            dataList.add(dataText2.toString())
+        while (cursor?.moveToNext()!!) {
+            val dataTitle = cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_TITLE))
+            val dataContent =
+                cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_CONTENT))
+            val dataUri =
+                cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_IMAGE_URI))
+
+            val item = ListItem()
+            item.title = dataTitle
+            item.desc = dataContent
+            item.uri = dataUri
+
+            dataList.add(item)
         }
         cursor.close()
         return dataList
     }
 
-    fun closeDb(){
+    fun closeDb() {
         myDbHelper.close()
     }
 }
