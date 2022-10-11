@@ -33,7 +33,7 @@ class MyAdapter(listMain: ArrayList<ListItem>, contextM: Context) :
                     putExtra(MyIntentConstants.I_DESC_KEY, item.desc)
                     putExtra(MyIntentConstants.I_URI_KEY, item.uri)
                 }
-            context.startActivity(intent)
+                context.startActivity(intent)
             }
         }
     }
@@ -53,11 +53,15 @@ class MyAdapter(listMain: ArrayList<ListItem>, contextM: Context) :
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateAdapter(listItems: ArrayList<ListItem>) {
-
         listArray.clear()
         listArray.addAll(listItems)
         notifyDataSetChanged()
     }
 
-
+    fun removeItem(pos:Int, dbManager: MyDbManager) {
+        dbManager.removeItemToDb(listArray[pos].id.toString())
+        listArray.removeAt(pos)
+        notifyItemRangeChanged(0,listArray.size)
+        notifyItemRemoved(pos)
+    }
 }

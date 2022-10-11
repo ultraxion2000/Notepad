@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.lessonsqlkotlin.db.MyAdapter
 import com.example.lessonsqlkotlin.db.MyDbManager
 import kotlinx.android.synthetic.main.activity_main.*
@@ -26,8 +28,9 @@ class MainActivity : AppCompatActivity() {
         myDbManager.openDb()
         fillAdapter()
     }
+
     fun onClickNew(view: View) {
-        val i = Intent(this, EditActivity::class.java )
+        val i = Intent(this, EditActivity::class.java)
         startActivity(i)
     }
 
@@ -36,20 +39,39 @@ class MainActivity : AppCompatActivity() {
         myDbManager.closeDb()
     }
 
-    fun init(){
+    fun init() {
         rcView.layoutManager = LinearLayoutManager(this)
+        val swapHelper = getSwapMg()
+        swapHelper.attachToRecyclerView(rcView)
         rcView.adapter = myAdapter
     }
 
-    fun fillAdapter(){
+    fun fillAdapter() {
         val list = myDbManager.readDbData()
         myAdapter.updateAdapter(list)
-        if(list.size > 0) {
+        if (list.size > 0) {
             tvNoElements.visibility = View.GONE
-        }else{
+        } else {
             tvNoElements.visibility = View.VISIBLE
         }
-
     }
+
+    private fun getSwapMg(): ItemTouchHelper {
+        return ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                myAdapter.removeItem(viewHolder.adapterPosition, myDbManager)
+
+            }
+        })
+    }
+
 
 }
