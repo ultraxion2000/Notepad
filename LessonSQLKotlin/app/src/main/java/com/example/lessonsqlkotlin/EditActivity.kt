@@ -9,6 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.lessonsqlkotlin.db.MyDbManager
 import com.example.lessonsqlkotlin.db.MyIntentConstants
 import kotlinx.android.synthetic.main.edit_activity.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EditActivity : AppCompatActivity() {
 
@@ -57,6 +62,7 @@ class EditActivity : AppCompatActivity() {
     fun onClickDeleteImage(view: View) {
         mainImageLayout.visibility = View.GONE
         fbAddImage.visibility = View.VISIBLE
+        tempImageUri = "empty"
     }
 
     fun onClickChooseImage(view: View) {
@@ -70,21 +76,24 @@ class EditActivity : AppCompatActivity() {
         val myDesc = edDesc.text.toString()
 
         if (myTitle != "" && myDesc != "") {
-            if (isEditState) {
-                myDbManager.updateItem(myTitle, myDesc, tempImageUri, id)
-            } else {
-                myDbManager.insertToDb(myTitle, myDesc, tempImageUri)
+            CoroutineScope(Dispatchers.Main).launch {
+                if (isEditState) {
+                    myDbManager.updateItem(myTitle, myDesc, tempImageUri, id, getCurrentTime())
+                } else {
+                    myDbManager.insertToDb(myTitle, myDesc, tempImageUri, getCurrentTime())
+                }
+                finish()
             }
-            finish()
         }
     }
      fun onEditEnable(view: View){
          edTitle.isEnabled = true
          edDesc.isEnabled = true
+         fbEdit.visibility = View.GONE
+         fbAddImage.visibility = View.VISIBLE
+         if(tempImageUri == "empty") return
          imButtonDelete.visibility = View.VISIBLE
          imButtonEditImage.visibility = View.VISIBLE
-         fbAddImage.visibility = View.VISIBLE
-         fbEdit.visibility = View.GONE
      }
 
     private fun getMyIntents() {
@@ -112,12 +121,20 @@ class EditActivity : AppCompatActivity() {
 
                     mainImageLayout.visibility = View.VISIBLE
 
-                    imMyImage.setImageURI(Uri.parse(i.getStringExtra(MyIntentConstants.I_URI_KEY)))
+                    tempImageUri = i.getStringExtra(MyIntentConstants.I_URI_KEY)!!
+
+                    imMyImage.setImageURI(Uri.parse(tempImageUri))
 
                     imButtonDelete.visibility = View.GONE
                     imButtonEditImage.visibility = View.GONE
                 }
             }
         }
+    }
+
+    private fun getCurrentTime(): String {
+        val time = Calendar.getInstance().time
+        val formatter = SimpleDateFormat("dd-MM-yy kk:mm", Locale.getDefault())
+        return formatter.format(time)
     }
 }

@@ -5,6 +5,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MyDbManager(context: Context) {
     val myDbHelper = MyDbHelper(context)
@@ -14,22 +16,24 @@ class MyDbManager(context: Context) {
         db = myDbHelper.writableDatabase
     }
 
-    fun insertToDb(title: String, content: String, uri: String) {
+    suspend fun insertToDb(title: String, content: String, uri: String, time: String) = withContext(Dispatchers.IO) {
 
         val values = ContentValues().apply {
             put(MyDbNameClass.COLUMN_NAME_TITLE, title)
             put(MyDbNameClass.COLUMN_NAME_CONTENT, content)
             put(MyDbNameClass.COLUMN_NAME_IMAGE_URI, uri)
+            put(MyDbNameClass.COLUMN_NAME_TIME, time)
         }
         db?.insert(MyDbNameClass.TABLE_NAME, null, values)
     }
 
-    fun updateItem (title: String, content: String, uri: String, id: Int) {
+    suspend fun updateItem (title: String, content: String, uri: String, id: Int, time: String) = withContext(Dispatchers.IO) {
         val selection = BaseColumns._ID + "=$id"
         val values = ContentValues().apply {
             put(MyDbNameClass.COLUMN_NAME_TITLE, title)
             put(MyDbNameClass.COLUMN_NAME_CONTENT, content)
             put(MyDbNameClass.COLUMN_NAME_IMAGE_URI, uri)
+            put(MyDbNameClass.COLUMN_NAME_TIME, time)
         }
         db?.update(MyDbNameClass.TABLE_NAME, values, selection, null)
     }
@@ -39,7 +43,7 @@ class MyDbManager(context: Context) {
     }
 
     @SuppressLint("Range")
-    fun readDbData(searchText: String): ArrayList<ListItem> {
+    suspend fun readDbData(searchText: String): ArrayList<ListItem> = withContext(Dispatchers.IO) {
         val dataList = ArrayList<ListItem>()
         val selection = "${MyDbNameClass.COLUMN_NAME_TITLE} like ?"
         val cursor = db?.query(
@@ -55,15 +59,18 @@ class MyDbManager(context: Context) {
                 cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_IMAGE_URI))
             val dataId =
                 cursor.getInt(cursor.getColumnIndex(BaseColumns._ID))
+            val time =
+                cursor.getString(cursor.getColumnIndex(MyDbNameClass.COLUMN_NAME_TIME))
             val item = ListItem()
             item.title = dataTitle
             item.desc = dataContent
             item.uri = dataUri
             item.id = dataId
+            item.time = time
             dataList.add(item)
         }
         cursor.close()
-        return dataList
+        return@withContext dataList
     }
 
     fun closeDb() {
