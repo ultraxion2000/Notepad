@@ -26,6 +26,7 @@
         android:hint="@string/ed_title_hint"
         android:inputType="textPersonName"
         android:padding="10dp"
+        android:textColor="@color/edit_text_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainImageLayout" />
@@ -42,6 +43,7 @@
         android:hint="@string/ed_desc_hint"
         android:inputType="textMultiLine|textPersonName"
         android:padding="10dp"
+        android:textColor="@color/edit_text_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/edTitle"
         app:layout_constraintHorizontal_bias="0.0"
@@ -74,7 +76,7 @@
         app:backgroundTint="@color/dark_orange"
         app:layout_constraintBottom_toTopOf="@+id/fbSave"
         app:layout_constraintEnd_toEndOf="@+id/fbSave"
-        app:srcCompat="@drawable/ic_add_image" />
+        app:srcCompat="@drawable/ic_baseline_insert_photo_24" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainImageLayout"
@@ -127,5 +129,17 @@
             app:srcCompat="@drawable/ic_del_image" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fbEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="24dp"
+        android:clickable="true"
+        android:onClick="onEditEnable"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_add_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

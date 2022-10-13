@@ -32,6 +32,7 @@ class MyAdapter(listMain: ArrayList<ListItem>, contextM: Context) :
                     putExtra(MyIntentConstants.I_TITLE_KEY, item.title)
                     putExtra(MyIntentConstants.I_DESC_KEY, item.desc)
                     putExtra(MyIntentConstants.I_URI_KEY, item.uri)
+                    putExtra(MyIntentConstants.I_ID_KEY, item.id)
                 }
                 context.startActivity(intent)
             }
